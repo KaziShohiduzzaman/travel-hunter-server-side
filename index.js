@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId
 
 
 const app = express();
@@ -20,7 +21,22 @@ console.log(uri);
 async function run() {
     try {
         await client.connect();
-        console.log('database connected');
+        const database = client.db('travelHunter');
+        const eventCollection = database.collection('events');
+
+        //GET events api
+        app.get('/events', async (req, res) => {
+            const cursor = eventCollection.find({});
+            const events = await cursor.toArray();
+            res.send(events);
+        })
+        // for dynamic route 
+        app.get('/events/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const event = await eventCollection.findOne(query);
+            res.send(event);
+        })
     }
     finally {
         // await client.close()
