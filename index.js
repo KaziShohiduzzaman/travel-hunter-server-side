@@ -67,6 +67,20 @@ async function run() {
             const event = await orderCollection.findOne(query);
             res.send(event);
         })
+        //Update api
+
+        app.put('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    status: "Approved"
+                },
+            };
+            const result = await orderCollection.updateOne(filter, updateDoc, options)
+            res.json(result)
+        })
 
 
         //DELETE api for manage tour
